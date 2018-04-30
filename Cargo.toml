@@ -1,0 +1,6 @@
+[package]
+name = "demo-inheritance"
+version = "0.1.0"
+authors = ["Paul Grandperrin <paul.grandperrin@gmail.com>"]
+
+[dependencies]
