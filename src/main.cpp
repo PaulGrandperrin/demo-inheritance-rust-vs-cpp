@@ -23,7 +23,7 @@ public:
         cout <<"  constructing ThickObject" << endl;
     }
 
-    float get_thickness() const override final {
+    virtual float get_thickness() const override final {
         cout <<"  accessing thickness" << endl;
         return this->thickness;
     }
@@ -38,7 +38,7 @@ public:
         cout <<"  constructing ThickCircle" << endl;
     }
 
-    float get_surface() const override {
+    virtual float get_surface() const override {
         cout << "  computing surface from ThickCircle" << endl;
         return M_PI * this->radius * this->radius;
     }
@@ -54,12 +54,12 @@ public:
         cout <<"  constructing ThickRectangle" << endl;
     }
 
-    float get_surface() const override {
+    virtual float get_surface() const override {
         cout << "  computing surface from ThickRectangle" << endl;
         return this->width * this->height;
     }
 
-    float get_volume() const override { // overriding default method
+    virtual float get_volume() const override { // overriding default method
         cout << "  computing volume from ThickRectangle" << endl;
         return this->width * this->height * this->thickness;
     }
