@@ -12,6 +12,8 @@ public:
         cout << "  computing volume from FlatObject" << endl;
         return get_surface() * get_thickness();
     }
+
+    virtual ~FlatObject() {}
 };
 
 class ThickObject: public FlatObject {
@@ -27,6 +29,10 @@ public:
         cout <<"  accessing thickness" << endl;
         return this->thickness;
     }
+
+    virtual ~ThickObject() {
+        cout << "  destroying ThickObject" << endl;
+    }
 };
 
 class ThickCircle: public ThickObject {
@@ -41,6 +47,10 @@ public:
     virtual float get_surface() const override {
         cout << "  computing surface from ThickCircle" << endl;
         return M_PI * this->radius * this->radius;
+    }
+
+    virtual ~ThickCircle() {
+        cout << "  destroying ThickCircle" << endl;
     }
 };
 
@@ -63,6 +73,10 @@ public:
         cout << "  computing volume from ThickRectangle" << endl;
         return this->width * this->height * this->thickness;
     }
+
+    virtual ~ThickRectangle() {
+        cout << "  destroying ThickRectangle" << endl;
+    }
 };
 
 // generic function using dynamic dispatch through vtable indirection
@@ -74,11 +88,15 @@ void print_volume(const FlatObject& o) {
 
 int main()
 {
-    cout << "ThickCircle of thickness 2 and radius 10" << endl;
-    const auto c = ThickCircle(2,10);
-    print_volume(c);
+    {
+        cout << "ThickCircle of thickness 2 and radius 10" << endl;
+        const auto c = ThickCircle(2,10);
+        print_volume(c);
+    }
     cout << endl;
-    cout << "ThickRectangle of thickness 3 and dimentions 2*4" << endl;
-    const auto r = ThickRectangle(3, 2, 4);
-    print_volume(r);
+    {
+        cout << "ThickRectangle of thickness 3 and dimentions 2*4" << endl;
+        const auto r = ThickRectangle(3, 2, 4);
+        print_volume(r);
+    }
 }
