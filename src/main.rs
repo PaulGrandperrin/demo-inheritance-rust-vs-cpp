@@ -50,7 +50,6 @@ impl<EXT> FlatObject for ThickObject<EXT> {
 
 impl<EXT> Drop for ThickObject<EXT> {
     fn drop(&mut self) {
-        println!("  dropping");
         self.destroy();
     }
 }
