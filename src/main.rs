@@ -3,7 +3,7 @@ use std::marker::PhantomData;
 
 // FlatObject
 
-trait FlatObjectTrait {
+trait FlatObject {
     fn get_surface(&self) -> f32;
     fn get_thickness(&self) -> f32;
 
@@ -15,19 +15,19 @@ trait FlatObjectTrait {
 
 // ThickObject
 
-struct ThickObjectStruct<EXT> {
+struct ThickObject<EXT> {
     thickness: f32,
     _e: EXT // _e(xtention) of type EXT(ention)
 }
 
-impl<EXT> ThickObjectStruct<EXT> {
+impl<EXT> ThickObject<EXT> {
     fn new_thick_object(thickness: f32, _e: EXT) -> Self {
         println!("  constructing ThickObject");
         Self {thickness, _e}
     }
 }
 
-impl<EXT> FlatObjectTrait for ThickObjectStruct<EXT> {
+impl<EXT> FlatObject for ThickObject<EXT> {
     fn get_thickness(&self) -> f32 {
         println!("  accessing thickness");
         self.thickness
@@ -40,20 +40,20 @@ impl<EXT> FlatObjectTrait for ThickObjectStruct<EXT> {
 
 // ThickCircle
 
-struct CircleExt<EXT> {
+struct Circle<EXT> {
     radius: f32,
     _e: EXT // _e(xtention) of type EXT(ention)
 }
-type ThickCircleStruct<EXT> = ThickObjectStruct<CircleExt<EXT>>;
+type ThickCircle<EXT> = ThickObject<Circle<EXT>>;
 
-impl<EXT> ThickCircleStruct<EXT> {
+impl<EXT> ThickCircle<EXT> {
     fn new_thick_circle(thickness: f32, radius: f32, _e: EXT) -> Self {
         println!("  constructing ThickCircle");
-        ThickObjectStruct::new_thick_object(thickness, CircleExt::<EXT>{radius, _e})
+        ThickObject::new_thick_object(thickness, Circle::<EXT>{radius, _e})
     }
 }
 
-impl<EXT> FlatObjectTrait for ThickCircleStruct<EXT> {
+impl<EXT> FlatObject for ThickCircle<EXT> {
     fn get_surface(&self) -> f32 {
         println!("  computing surface from ThickCircle");
         std::f32::consts::PI * self._e.radius * self._e.radius
@@ -62,22 +62,22 @@ impl<EXT> FlatObjectTrait for ThickCircleStruct<EXT> {
 
 // ThickRectangle
 
-struct RectangleExt {
+struct Rectangle {
     height: f32,
     width: f32,
 }
-type ThickRectangleStruct = ThickObjectStruct<RectangleExt>;
+type ThickRectangle = ThickObject<Rectangle>;
 
 
 
-impl ThickRectangleStruct {
+impl ThickRectangle {
     fn new_thick_rectangle(thickness: f32, height: f32, width: f32) -> Self {
         println!("  constructing ThickRectangle");
-        ThickObjectStruct::new_thick_object(thickness, RectangleExt{height, width})
+        ThickObject::new_thick_object(thickness, Rectangle{height, width})
     }
 }
 
-impl FlatObjectTrait for ThickRectangleStruct {
+impl FlatObject for ThickRectangle {
     fn get_surface(&self) -> f32 {
         println!("  computing surface from ThickRectangle");
         self._e.height * self._e.width
@@ -91,17 +91,17 @@ impl FlatObjectTrait for ThickRectangleStruct {
 
 // generic function using static dispatch through monomorphization
 
-fn print_volume(o: impl FlatObjectTrait) {
+fn print_volume(o: impl FlatObject) {
     let volume = o.get_volume();
     println!("volume: {}", volume);
 }
 
 fn main() {
     println!("ThickCircle of thickness 2 and radius 10");
-    let c = ThickCircleStruct::new_thick_circle(2., 10., PhantomData::<!>);
-    print_volume(c); // using FlatObjectTrait::get_volume()
+    let c = ThickCircle::new_thick_circle(2., 10., PhantomData::<!>);
+    print_volume(c); // using FlatObject::get_volume()
     println!();
     println!("ThickRectangle of thickness 3 and dimentions 2*4");
-    let r = ThickRectangleStruct::new_thick_rectangle(3., 2., 4.);
+    let r = ThickRectangle::new_thick_rectangle(3., 2., 4.);
     print_volume(r); // using ThickRectangleTrait::get_volume()
 }
