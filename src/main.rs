@@ -3,7 +3,7 @@ use std::marker::PhantomData;
 
 // FlatObject
 
-trait FlatObject {
+trait FlatObject: Drop {
     fn get_surface(&self) -> f32;
     fn get_thickness(&self) -> f32;
 
@@ -11,6 +11,8 @@ trait FlatObject {
         println!("  computing volume from FlatObject");
         self.get_surface() * self.get_thickness()
     }
+
+    fn destroy(&mut self);
 }
 
 // ThickObject
@@ -25,6 +27,10 @@ impl<EXT> ThickObject<EXT> {
         println!("  constructing ThickObject");
         Self {thickness, _e}
     }
+
+    fn destroy_thick_object(&mut self) {
+        println!("  destroying ThickObject");
+    }
 }
 
 impl<EXT> FlatObject for ThickObject<EXT> {
@@ -35,6 +41,17 @@ impl<EXT> FlatObject for ThickObject<EXT> {
 
     default fn get_surface(&self) -> f32 {
         unreachable!()
+    }
+
+    default fn destroy(&mut self) {
+        self.destroy_thick_object()
+    }
+}
+
+impl<EXT> Drop for ThickObject<EXT> {
+    fn drop(&mut self) {
+        println!("  dropping");
+        self.destroy();
     }
 }
 
@@ -51,12 +68,21 @@ impl<EXT> ThickCircle<EXT> {
         println!("  constructing ThickCircle");
         ThickObject::new_thick_object(thickness, Circle::<EXT>{radius, _e})
     }
+
+    fn destroy_thick_circle(&mut self) {
+        println!("  destroying ThickCircle");
+    }
 }
 
 impl<EXT> FlatObject for ThickCircle<EXT> {
     fn get_surface(&self) -> f32 {
         println!("  computing surface from ThickCircle");
         std::f32::consts::PI * self._e.radius * self._e.radius
+    }
+
+    default fn destroy(&mut self) {
+        self.destroy_thick_circle();
+        self.destroy_thick_object();
     }
 }
 
@@ -75,6 +101,10 @@ impl ThickRectangle {
         println!("  constructing ThickRectangle");
         ThickObject::new_thick_object(thickness, Rectangle{height, width})
     }
+
+    fn destroy_thick_rectangle(&mut self) {
+        println!("  destroying ThickRectangle");
+    }
 }
 
 impl FlatObject for ThickRectangle {
@@ -86,6 +116,11 @@ impl FlatObject for ThickRectangle {
     fn get_volume(&self) -> f32 { // overriding default method
         println!("  computing volume from ThickRectangle");
         self._e.height * self._e.width * self.thickness
+    }
+
+    fn destroy(&mut self) {
+        self.destroy_thick_rectangle();
+        self.destroy_thick_object();
     }
 }
 
