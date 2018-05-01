@@ -20,11 +20,7 @@ struct ThickObjectStruct<EXT> {
     _e: EXT // _e(xtention) of type EXT(ention)
 }
 
-trait ThickObjectTrait<EXT>: FlatObjectTrait {
-    fn new_thick_object(thickness: f32, _e: EXT) -> Self;
-}
-
-impl<EXT> ThickObjectTrait<EXT> for ThickObjectStruct<EXT> {
+impl<EXT> ThickObjectStruct<EXT> {
     fn new_thick_object(thickness: f32, _e: EXT) -> Self {
         println!("  constructing ThickObject");
         Self {thickness, _e}
@@ -50,14 +46,10 @@ struct CircleExt<EXT> {
 }
 type ThickCircleStruct<EXT> = ThickObjectStruct<CircleExt<EXT>>;
 
-trait ThickCircleTrait<EXT> {
-    fn new_thick_circle(thickness: f32, radius: f32, _e: EXT) -> Self;
-}
-
-impl<EXT> ThickCircleTrait<EXT> for ThickCircleStruct<EXT> {
+impl<EXT> ThickCircleStruct<EXT> {
     fn new_thick_circle(thickness: f32, radius: f32, _e: EXT) -> Self {
         println!("  constructing ThickCircle");
-        ThickObjectTrait::new_thick_object(thickness, CircleExt::<EXT>{radius, _e})
+        ThickObjectStruct::new_thick_object(thickness, CircleExt::<EXT>{radius, _e})
     }
 }
 
@@ -76,14 +68,12 @@ struct RectangleExt {
 }
 type ThickRectangleStruct = ThickObjectStruct<RectangleExt>;
 
-trait ThickRectangleTrait {
-    fn new_thick_rectangle(thickness: f32, height: f32, width: f32) -> Self;
-}
 
-impl ThickRectangleTrait for ThickRectangleStruct {
+
+impl ThickRectangleStruct {
     fn new_thick_rectangle(thickness: f32, height: f32, width: f32) -> Self {
         println!("  constructing ThickRectangle");
-        ThickObjectTrait::new_thick_object(thickness, RectangleExt{height, width})
+        ThickObjectStruct::new_thick_object(thickness, RectangleExt{height, width})
     }
 }
 
@@ -93,7 +83,7 @@ impl FlatObjectTrait for ThickRectangleStruct {
         self._e.height * self._e.width
     }
 
-    fn get_volume(&self) -> f32 { // overriding parent method
+    fn get_volume(&self) -> f32 { // overriding default method
         println!("  computing volume from ThickRectangle");
         self._e.height * self._e.width * self.thickness
     }
