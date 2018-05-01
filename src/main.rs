@@ -23,9 +23,9 @@ struct ThickObject<EXT> {
 }
 
 impl<EXT> ThickObject<EXT> {
-    fn new_thick_object(thickness: f32, _e: EXT) -> Self {
+    fn new_thick_object<C: FnOnce() -> EXT>(thickness: f32, _c: C) -> Self {
         println!("  constructing ThickObject");
-        Self {thickness, _e}
+        Self {thickness, _e: _c()}
     }
 
     fn destroy_thick_object(&mut self) {
@@ -64,9 +64,12 @@ struct Circle<EXT> {
 type ThickCircle<EXT> = ThickObject<Circle<EXT>>;
 
 impl<EXT> ThickCircle<EXT> {
-    fn new_thick_circle(thickness: f32, radius: f32, _e: EXT) -> Self {
-        println!("  constructing ThickCircle");
-        ThickObject::new_thick_object(thickness, Circle::<EXT>{radius, _e})
+    fn new_thick_circle<C: FnOnce() -> EXT>(thickness: f32, radius: f32, _c: C) -> Self {
+        let c = || {
+            println!("  constructing ThickCircle");
+            Circle::<EXT>{radius, _e: _c()}
+        };
+        ThickObject::new_thick_object(thickness, c)
     }
 
     fn destroy_thick_circle(&mut self) {
@@ -98,8 +101,11 @@ type ThickRectangle = ThickObject<Rectangle>;
 
 impl ThickRectangle {
     fn new_thick_rectangle(thickness: f32, height: f32, width: f32) -> Self {
-        println!("  constructing ThickRectangle");
-        ThickObject::new_thick_object(thickness, Rectangle{height, width})
+        let c = || {
+            println!("  constructing ThickRectangle");
+            Rectangle{height, width}
+        };
+        ThickObject::new_thick_object(thickness, c)
     }
 
     fn destroy_thick_rectangle(&mut self) {
@@ -133,7 +139,7 @@ fn print_volume(o: impl FlatObject) {
 
 fn main() {
     println!("ThickCircle of thickness 2 and radius 10");
-    let c = ThickCircle::new_thick_circle(2., 10., PhantomData::<!>);
+    let c = ThickCircle::new_thick_circle(2., 10., ||{PhantomData::<!>});
     print_volume(c); // using FlatObject::get_volume()
     println!();
     println!("ThickRectangle of thickness 3 and dimentions 2*4");
